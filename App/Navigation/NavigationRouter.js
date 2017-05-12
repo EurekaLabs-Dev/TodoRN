@@ -6,6 +6,7 @@ import NavigationDrawer from './NavigationDrawer'
 // screens identified by the router
 import LaunchScreen from '../Containers/LaunchScreen'
 import TodoSemReduxScreen from '../Containers/TodoSemReduxScreen.js'
+import CervejaScreen from '../Containers/CervejaScreen'
 
 /* **************************
 * Documentation: https://github.com/aksonov/react-native-router-flux
@@ -17,7 +18,8 @@ class NavigationRouter extends Component {
       <Router>
         <Scene key='drawer' component={NavigationDrawer} open={false}>
           <Scene key='drawerChildrenWrapper' navigationBarStyle={Styles.navBar} titleStyle={Styles.title} leftButtonIconStyle={Styles.leftButton} rightButtonTextStyle={Styles.rightButton}>
-            <Scene initial key='todoScreen' component={TodoSemReduxScreen} title='Todo' hideNavBar />
+            <Scene initial key='novaCerveja' component={TodoSemReduxScreen} title='Cerveja Salva' />
+            <Scene key='cervejaSalva' component={CervejaScreen} title='Nova Cerveja' />
           </Scene>
         </Scene>
       </Router>

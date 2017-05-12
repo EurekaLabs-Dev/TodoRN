@@ -1,10 +1,11 @@
 import React from 'react'
-import { ScrollView, Text, TextInput, KeyboardAvoidingView } from 'react-native'
+import { ScrollView, Text, TextInput, KeyboardAvoidingView, AsyncStorage } from 'react-native'
 import { connect } from 'react-redux'
 import TodoInput from '../Components/TodoInput'
 import TodoList from '../Components/TodoList'
 import api from '../Services/FixtureApi'
 import TodoActions from '../Redux/TodoRedux'
+import {Actions as NavigationActions} from 'react-native-router-flux'
 
 
 const mapDispatchToProps = (dispatch) => ({
@@ -21,77 +22,30 @@ const ErrorMessage = ({msg}) => (
 
 class Todo extends React.Component {
   state = {
-    todos: [],
-    currentTodo: {},
-    errorMessage: null
+    nomeCerveja: '',
+    error: null
   }
 
-  handleTodoChange = text => {
-    this.setState({
-      currentTodo: {
-        ...this.state.currentTodo,
-        text
-      }
-    })
-  }
-
-  onSaveTodo = response => {
-    if (response.ok) {
-      const newTodo = response.data
-      this.setState({
-        todos: this.state.todos.filter(t => t.id !== newTodo.id).concat(newTodo),
-        currentTodo: {},
-        errorMessage: null
-      })
-      return;
+  salvarCerveja() {
+    const cerveja = {
+      id: Date.now(),
+      nome: this.state.nomeCerveja
     }
-
-    this.setState({
-      errorMessage: response.data.message
-    })
+    AsyncStorage.setItem('cerveja', JSON.stringify(cerveja))
+    NavigationActions.cervejaSalva({cerveja})
   }
 
-  saveTodo = (todo) => this.props.criarTodo(todo)
-
-  editTodo = todo => this.setState({currentTodo: todo})
-
-  removeTodo = todo => {
-    api.removeTodo(todo)
-      .then(response => {
-        this.setState({
-          todos: this.state.todos.filter(t => t.id !== todo.id) })
-      })
-  }
-
-  toggleTodo = todo => {
-    console.log(todo)
-    const toggledTodo = {...todo, done: !todo.done}
-    this.saveTodo(toggledTodo)
-  }
-
-  componentDidMount() {
-    api.fetchTodos()
-      .then(response => {
-        if (response.ok) return this.setState({todos: response.data})
-        Alert.alert('Aviso', 'Não foi possível buscar todos na api.')
-      })
-  }
+  handleTextChange = text =>
+    this.setState({ nomeCerveja: text })
 
   render () {
-    const {currentTodo, todos } = this.state;
-
     return (
-      <ScrollView style={styles.container}>
+      <ScrollView style={[styles.container, {paddingTop: 50}]}>
         <TodoInput
-          value={currentTodo.text}
-          onSave={() => this.saveTodo(currentTodo)}
-          onChange={this.handleTodoChange}/>
+          value={this.state.nomeCerveja}
+          onSave={() => this.salvarCerveja()}
+          onChange={this.handleTextChange}/>
         <ErrorMessage msg={this.state.errorMessage}/>
-        <TodoList
-          todos={todos}
-          onSelect={this.editTodo}
-          onToggle={this.toggleTodo}
-          onRemove={this.removeTodo}/>
       </ScrollView>
     )
   }
