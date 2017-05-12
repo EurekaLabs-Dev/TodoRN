@@ -4,12 +4,14 @@ import Config from '../Config/DebugConfig'
 import createSagaMiddleware from 'redux-saga'
 import RehydrationServices from '../Services/RehydrationServices'
 import ReduxPersist from '../Config/ReduxPersist'
+import ReduxThunk from 'redux-thunk'
+import logger from 'redux-logger'
 
 // creates the store
 export default (rootReducer, rootSaga) => {
   /* ------------- Redux Configuration ------------- */
 
-  const middleware = []
+  const middleware = [ReduxThunk, logger]
   const enhancers = []
 
   /* ------------- Saga Middleware ------------- */

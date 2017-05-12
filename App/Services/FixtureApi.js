@@ -24,7 +24,7 @@ export default {
   createTodo: todo => {
     if (!todo.text) {
       return Promise.resolve({
-        ok: false, 
+        ok: false,
         data: {message: 'Informe a descrição'}
       })
     }
@@ -39,9 +39,9 @@ export default {
   fetchTodos: () => Promise.resolve({
     ok: true,
     data: [
-      {id: 1, text: 'Comprar Cerverja', done: true},
+      {id: 1, text: 'Comprar Chopp', done: true},
       {id: 2, text: 'Comprar carne', done: false},
       {id: 3, text: 'Fazer churrasco', done: false}
     ]
-  }) 
+  })
 }
