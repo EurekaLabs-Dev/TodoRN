@@ -8,7 +8,8 @@ import TodoActions from '../Redux/TodoRedux'
 const mapDispatchToProps = (dispatch) => ({
   criarTodo: () => dispatch(TodoActions.createTodoRequest()),
   handleTodoChange: text => dispatch(TodoActions.changeCurrentTodo(text)),
-  handleTodoSelect: todo => dispatch(TodoActions.selectTodo(todo))
+  handleTodoSelect: todo => dispatch(TodoActions.selectTodo(todo)),
+  removeTodo: todo => dispatch(TodoActions.removeTodo(todo))
 })
 
 const mapStateToProps = state => ({
@@ -30,6 +31,8 @@ class Todo extends React.Component {
     this.props.handleTodoChange(text)
   }
 
+
+
   saveTodo = () => {
     this.props.criarTodo()
   }
@@ -49,7 +52,7 @@ class Todo extends React.Component {
   }
 
   render () {
-    const { todos, currentTodo = {}, errorMessage, handleTodoSelect } = this.props
+    const { todos, currentTodo = {}, errorMessage, handleTodoSelect, removeTodo } = this.props
 
     return (
       <ScrollView style={styles.container}>
@@ -62,7 +65,7 @@ class Todo extends React.Component {
           todos={todos}
           onSelect={handleTodoSelect}
           onToggle={this.toggleTodo}
-          onRemove={this.removeTodo}/>
+          onRemove={removeTodo}/>
       </ScrollView>
     )
   }
