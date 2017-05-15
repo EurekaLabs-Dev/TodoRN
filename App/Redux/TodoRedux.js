@@ -6,24 +6,42 @@ import api from '../Services/FixtureApi'
 
 const { Types, Creators } = createActions({
   changeCurrentTodo: ['text'],
+  selectTodo: ['todo'],
   createTodoRequest: () => (dispatch, getState) => {
     const currentTodo = getState().todo.currentTodo
     dispatch({type: 'CREATE_TODO_REQUEST', todo: currentTodo })
-    api.createTodo(currentTodo)
-      .then(response => {
-        if (response.ok) {
-          dispatch({
-            type: 'CREATE_TODO_SUCCESS',
-            todo: response.data
-          })
-          return;
-        }
+    if(currentTodo.id)
+      api.updateTodo(currentTodo)
+        .then(response => {
+          if (response.ok) {
+            dispatch({
+              type: 'CREATE_TODO_SUCCESS',
+              todo: response.data
+            })
+            return;
+          }
 
-        dispatch({
-          type: 'CREATE_TODO_ERROR',
-          error: response.data
+          dispatch({
+            type: 'CREATE_TODO_ERROR',
+            error: response.data
+          })
+      });
+    else
+      api.createTodo(currentTodo)
+        .then(response => {
+          if (response.ok) {
+            dispatch({
+              type: 'CREATE_TODO_SUCCESS',
+              todo: response.data
+            })
+            return;
+          }
+
+          dispatch({
+            type: 'CREATE_TODO_ERROR',
+            error: response.data
+          })
         })
-      })
   },
   limparTodos: null
 })
@@ -59,10 +77,14 @@ export const deuErrado = (state, {error}) =>
   state.merge({ fetching: false, errorMessage: error.message })
 
 
-  export const changeCurrentTodo = (state, {text}) =>{
-    const actualTodo = {...state.currentTodo, text}
-    return state.merge({currentTodo:actualTodo})
-  }
+export const changeCurrentTodo = (state, {text}) =>{
+  const actualTodo = {...state.currentTodo, text}
+  return state.merge({currentTodo:actualTodo})
+}
+
+export const selectTodo = (state, {todo}) => {
+  return state.merge({currentTodo:todo})
+}
 /* ------------- Hookup Reducers To Types ------------- */
 
 export const reducer = createReducer(INITIAL_STATE, {
@@ -71,5 +93,6 @@ export const reducer = createReducer(INITIAL_STATE, {
   CREATE_TODO_ERROR: deuErrado,
   LOGOUT: () => INITIAL_STATE,
   [Types.LIMPAR_TODOS]: () => INITIAL_STATE,
-  [Types.CHANGE_CURRENT_TODO] : changeCurrentTodo
+  [Types.CHANGE_CURRENT_TODO] : changeCurrentTodo,
+  [Types.SELECT_TODO] : selectTodo
 })
