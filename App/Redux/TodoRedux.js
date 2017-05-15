@@ -5,10 +5,11 @@ import api from '../Services/FixtureApi'
 /* ------------- Types and Action Creators ------------- */
 
 const { Types, Creators } = createActions({
-  createTodoRequest: (todo) => (dispatch) => {
-    console.log(todo)
-    dispatch({type: 'CREATE_TODO_REQUEST', todo})
-    api.createTodo(todo)
+  changeCurrentTodo: ['text'],
+  createTodoRequest: () => (dispatch, getState) => {
+    const currentTodo = getState().todo.currentTodo
+    dispatch({type: 'CREATE_TODO_REQUEST', todo: currentTodo })
+    api.createTodo(currentTodo)
       .then(response => {
         if (response.ok) {
           dispatch({
@@ -48,6 +49,7 @@ export const fazendoRequest = (state) =>
 export const deuCertoCriar = (state, {todo}) => {
   return state.merge({
     fetching: false,
+    currentTodo: {},
     todos: state.todos.filter(t => t.id !== todo.id).concat(todo)
   })
 }
@@ -56,6 +58,11 @@ export const deuCertoCriar = (state, {todo}) => {
 export const deuErrado = (state, {error}) =>
   state.merge({ fetching: false, errorMessage: error.message })
 
+
+  export const changeCurrentTodo = (state, {text}) =>{
+    const actualTodo = {...state.currentTodo, text}
+    return state.merge({currentTodo:actualTodo})
+  }
 /* ------------- Hookup Reducers To Types ------------- */
 
 export const reducer = createReducer(INITIAL_STATE, {
@@ -63,5 +70,6 @@ export const reducer = createReducer(INITIAL_STATE, {
   CREATE_TODO_SUCCESS: deuCertoCriar,
   CREATE_TODO_ERROR: deuErrado,
   LOGOUT: () => INITIAL_STATE,
-  [Types.LIMPAR_TODOS]: () => INITIAL_STATE
+  [Types.LIMPAR_TODOS]: () => INITIAL_STATE,
+  [Types.CHANGE_CURRENT_TODO] : changeCurrentTodo
 })

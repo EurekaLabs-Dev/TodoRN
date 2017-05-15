@@ -3,12 +3,16 @@ import { ScrollView, Text, TextInput, KeyboardAvoidingView } from 'react-native'
 import { connect } from 'react-redux'
 import TodoInput from '../Components/TodoInput'
 import TodoList from '../Components/TodoList'
-import api from '../Services/FixtureApi'
 import TodoActions from '../Redux/TodoRedux'
 
-
 const mapDispatchToProps = (dispatch) => ({
-  criarTodo: todo => dispatch(TodoActions.createTodoRequest(todo))
+  criarTodo: () => dispatch(TodoActions.createTodoRequest()),
+  handleTodoChange: text => dispatch(TodoActions.changeCurrentTodo(text))
+})
+
+const mapStateToProps = state => ({
+  todos: state.todo.todos,
+  currentTodo: state.todo.currentTodo,
 })
 
 // Styles
@@ -20,38 +24,14 @@ const ErrorMessage = ({msg}) => (
 
 
 class Todo extends React.Component {
-  state = {
-    todos: [],
-    currentTodo: {},
-    errorMessage: null
-  }
 
   handleTodoChange = text => {
-    this.setState({
-      currentTodo: {
-        ...this.state.currentTodo,
-        text
-      }
-    })
+    this.props.handleTodoChange(text)
   }
 
-  onSaveTodo = response => {
-    if (response.ok) {
-      const newTodo = response.data
-      this.setState({
-        todos: this.state.todos.filter(t => t.id !== newTodo.id).concat(newTodo),
-        currentTodo: {},
-        errorMessage: null
-      })
-      return;
-    }
-
-    this.setState({
-      errorMessage: response.data.message
-    })
+  saveTodo = () => {
+    this.props.criarTodo()
   }
-
-  saveTodo = (todo) => this.props.criarTodo(todo)
 
   editTodo = todo => this.setState({currentTodo: todo})
 
@@ -69,24 +49,16 @@ class Todo extends React.Component {
     this.saveTodo(toggledTodo)
   }
 
-  componentDidMount() {
-    api.fetchTodos()
-      .then(response => {
-        if (response.ok) return this.setState({todos: response.data})
-        Alert.alert('Aviso', 'Não foi possível buscar todos na api.')
-      })
-  }
-
   render () {
-    const {currentTodo, todos } = this.state;
+    const { todos, currentTodo = {}, errorMessage } = this.props
 
     return (
       <ScrollView style={styles.container}>
         <TodoInput
           value={currentTodo.text}
-          onSave={() => this.saveTodo(currentTodo)}
+          onSave={this.saveTodo}
           onChange={this.handleTodoChange}/>
-        <ErrorMessage msg={this.state.errorMessage}/>
+        <ErrorMessage msg={errorMessage}/>
         <TodoList
           todos={todos}
           onSelect={this.editTodo}
@@ -98,4 +70,4 @@ class Todo extends React.Component {
 
 }
 
-export default connect(null, mapDispatchToProps)(Todo)
+export default connect(mapStateToProps, mapDispatchToProps)(Todo)
