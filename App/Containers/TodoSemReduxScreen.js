@@ -9,7 +9,8 @@ const mapDispatchToProps = (dispatch) => ({
   criarTodo: () => dispatch(TodoActions.createTodoRequest()),
   handleTodoChange: text => dispatch(TodoActions.changeCurrentTodo(text)),
   handleTodoSelect: todo => dispatch(TodoActions.selectTodo(todo)),
-  removeTodo: todo => dispatch(TodoActions.removeTodo(todo))
+  removeTodo: todo => dispatch(TodoActions.removeTodo(todo)),
+  toggleTodo: todo => dispatch(TodoActions.toggleTodo(todo))
 })
 
 const mapStateToProps = state => ({
@@ -52,7 +53,14 @@ class Todo extends React.Component {
   }
 
   render () {
-    const { todos, currentTodo = {}, errorMessage, handleTodoSelect, removeTodo } = this.props
+    const {
+      todos,
+      currentTodo = {},
+      errorMessage,
+      handleTodoSelect,
+      removeTodo,
+      toggleTodo
+    } = this.props
 
     return (
       <ScrollView style={styles.container}>
@@ -64,7 +72,7 @@ class Todo extends React.Component {
         <TodoList
           todos={todos}
           onSelect={handleTodoSelect}
-          onToggle={this.toggleTodo}
+          onToggle={toggleTodo}
           onRemove={removeTodo}/>
       </ScrollView>
     )

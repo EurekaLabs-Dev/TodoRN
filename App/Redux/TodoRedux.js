@@ -7,6 +7,7 @@ import api from '../Services/FixtureApi'
 const { Types, Creators } = createActions({
   changeCurrentTodo: ['text'],
   selectTodo: ['todo'],
+  toggleTodo: ['todo'],
   removeTodo: ['todo'],
   createTodoRequest: () => (dispatch, getState) => {
     const currentTodo = getState().todo.currentTodo
@@ -91,6 +92,16 @@ export const removeTodo = (state, {todo}) => {
  const todosMenosAqueleLah = state.todos.filter(t => t.id !== todo.id)
   return state.merge({todos: todosMenosAqueleLah})
 }
+
+const toggleTodo = (state, {todo}) => {
+  const todos = state.todos.map(t => {
+    if (t.id === todo.id)
+      return t.merge({done: !t.done})
+
+    return t
+  })
+  return state.merge({ todos })
+}
 /* ------------- Hookup Reducers To Types ------------- */
 
 export const reducer = createReducer(INITIAL_STATE, {
@@ -101,5 +112,6 @@ export const reducer = createReducer(INITIAL_STATE, {
   [Types.LIMPAR_TODOS]: () => INITIAL_STATE,
   [Types.CHANGE_CURRENT_TODO] : changeCurrentTodo,
   [Types.SELECT_TODO] : selectTodo,
-  [Types.REMOVE_TODO]: removeTodo
+  [Types.REMOVE_TODO]: removeTodo,
+  [Types.TOGGLE_TODO]: toggleTodo
 })
